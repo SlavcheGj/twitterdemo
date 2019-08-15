@@ -3,29 +3,38 @@ package com.endava.twitterdemo.Controller;
 import com.endava.twitterdemo.Model.User;
 import com.endava.twitterdemo.Repository.UserRepository;
 import com.google.gson.Gson;
-import org.graalvm.compiler.lir.LIRInstruction;
+
 import org.junit.Before;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Optional;
 
 import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserControllerTestIt {
 
     private static final String URL_USER_SAVE = "/user";
+    private static final String URL_GET_USER_BY_ID = "/user/1";
+    private static final String URL_UPDATE_USER_PASSWORD= "/user/2";
+    private static final String URL_DELETE_USER= "/user";
     protected MockMvc mockMvc;
 
     @Autowired
@@ -34,46 +43,68 @@ public class UserControllerTestIt {
     @Autowired
     private UserRepository userRepository;
 
+    private User user;
+    private User updateUser;
     private Gson gson;
     @Before
     public void setUp() {
         gson = new Gson();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        user = new User().withEmail("kfsnaans@gmail.com").withUsername("Trajce").withPassword("password1243").withId(1L);
+        updateUser = new User().withEmail("hsgaioshogiheio@gmail.com").withUsername("Dimitar").withPassword("kiko1243").withId(2L);
+        userRepository.save(user);
+        userRepository.save(updateUser);
+
     }
+
 
 
     @Test
     public void createUser() throws Exception {
-
-        User user = new User().withEmail("kfsnaans@gmail.com").withUsername("Trajce").withPassword("password1243");
-        String jsonString = gson.toJson(user);
+        User newUser = new User().withEmail("bla_bla@gmail.com").withUsername("Slavche").withPassword("lllaaa");
+        String jsonString = gson.toJson(newUser);
         mockMvc.perform(post(URL_USER_SAVE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonString)
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
 
-        Optional<User> userFromDb = userRepository.findById(1L);
+        Optional<User> userFromDb = userRepository.findById(3L);
 
-        assertEquals(user.getUsername(),userFromDb.get().getUsername());
-        assertEquals(user.getPassword(),userFromDb.get().getPassword());
+        assertEquals(newUser.getUsername(),userFromDb.get().getUsername());
+        assertEquals(newUser.getPassword(),userFromDb.get().getPassword());
 
     }
 
     @Test
     public void getUserById() throws Exception {
-        User user = new User().withEmail("kfsnaans@gmail.com").withUsername("Trajce").withPassword("password1243");
-        String jsonString = gson.toJson(user);
-        mockMvc.perform(post(URL_USER_SAVE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(jsonString)
-                .accept(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
+
+       MvcResult mvcResult = mockMvc.perform(get(URL_GET_USER_BY_ID)
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(status().isOk()).andReturn();
+
+       String content = mvcResult.getResponse().getContentAsString();
+        //System.out.println(content);
+       User returnedUser = gson.fromJson(content, User.class);
+        assertEquals(user.getUsername(), returnedUser.getUsername());
+        assertThat(returnedUser.getPassword()).isEqualTo(user.getPassword());
     }
 
     @Test
-    public void updateUser() {
+    public void updateUser() throws Exception {
+        mockMvc.perform(put(URL_UPDATE_USER_PASSWORD)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("password","passwordblablabal")).andExpect(status().isOk());
+        Optional<User> modifiedUser = userRepository.findById(2L);
+        assertThat(user.getPassword()).isNotEqualTo(modifiedUser.get().getPassword());
     }
 
     @Test
-    public void deleteUser() {
+    public void deleteUser() throws Exception {
+        mockMvc.perform(delete(URL_DELETE_USER)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id","2")).andExpect(status().isOk());
+
+        assertThat(userRepository.findById(2L).isPresent()).isFalse();
+
     }
+
 }

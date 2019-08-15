@@ -2,7 +2,9 @@ package com.endava.twitterdemo.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Wither;
 
 
 import javax.persistence.*;
@@ -13,8 +15,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Wither
 public class Tweet {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,6 +37,8 @@ public class Tweet {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         this.dateOfCreation = formatter.parse(dateOfCreation);
     }
+
+
 
 
     public Long getId() {
