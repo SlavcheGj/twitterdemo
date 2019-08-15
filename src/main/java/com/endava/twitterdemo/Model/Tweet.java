@@ -1,11 +1,15 @@
 package com.endava.twitterdemo.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
@@ -17,16 +21,19 @@ public class Tweet {
     private Long id;
     @NotBlank
     private String content;
+    @Temporal(TemporalType.DATE)
     private Date dateOfCreation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = "tweets")
     private User user;
 
-    public Tweet(@NotBlank String content, Date dateOfCreation) {
+    public Tweet(@NotBlank String content, String dateOfCreation) throws ParseException {
         this.content = content;
-        this.dateOfCreation = dateOfCreation;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        this.dateOfCreation = formatter.parse(dateOfCreation);
     }
+
 
     public Long getId() {
         return id;
