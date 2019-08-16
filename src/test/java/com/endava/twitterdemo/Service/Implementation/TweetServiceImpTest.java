@@ -13,9 +13,16 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Matchers.any;
 
 @RunWith(SpringRunner.class)
 public class TweetServiceImpTest {
@@ -61,26 +68,71 @@ public class TweetServiceImpTest {
     }
 
     @Test
-    public void getTweetById() {
+    public void shouldGetTweetById() {
+        Mockito.when(tweetRepository.findById(2L)).thenReturn(java.util.Optional.of(originalTweet));
+        Optional<Tweet> foundTweet = tweetServiceImp.getTweetById(2L);
+
+        assertThat(foundTweet.get().getContent()).isEqualTo(originalTweet.getContent());
+        assertThat(foundTweet.get().getDateOfCreation()).isEqualTo(originalTweet.getDateOfCreation());
     }
 
     @Test
-    public void getAllTweetsByUserId() {
+    public void shouldGetAllTweetsByUserId() throws ParseException {
+        Set<Tweet> tweets = new HashSet<>();
+        tweets.add(originalTweet);
+        tweets.add(new Tweet("INLINE BOIS", "2019-05-05"));
+        Mockito.when(tweetRepository.findAllByUserId(1L)).thenReturn(new HashSet<>(tweets));
+        Set<Tweet> foundTweets = tweetServiceImp.getAllTweetsByUserId(1L);
+
+        assertThat(foundTweets).isEqualTo(tweets);
     }
 
     @Test
-    public void getAllTweetsByUserIdOnGivenDay() {
+    public void getAllTweetsByUserIdOnGivenDay() throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        Set<Tweet> tweets = new HashSet<>();
+        tweets.add(originalTweet);
+        Mockito.when(tweetRepository.findAllByDateOfCreationAndUserId(formatter.parse("2019-05-06"), 1L)).thenReturn(new HashSet<>(tweets));
+        Set<Tweet> foundTweets = tweetServiceImp.getAllTweetsByUserIdOnGivenDay(1L, "2019-05-06");
+
+        assertThat(foundTweets).isEqualTo(tweets);
     }
 
     @Test
-    public void getAllUserThatHaveTweetedLastMonth() {
+    public void getAllUserThatHaveTweetedLastMonth() throws ParseException {
+        Set<Tweet> tweets = new HashSet<>();
+        tweets.add(new Tweet("INLINE BOIS", "2019-05-05").withUser(originalUser));
+        Mockito.when(tweetRepository.findAllUserByDateOfCreationBetween(any(Date.class), any(Date.class))).thenReturn(new HashSet<>(tweets));
+
+        Set<User> expectedUsers = new HashSet<>();
+        expectedUsers.add(originalUser);
+        Set<User> foundUsers = tweetServiceImp.getAllUserThatHaveTweetedLastMonth();
+
+        assertThat(foundUsers).isEqualTo(expectedUsers);
     }
 
     @Test
     public void updateContent() {
+        Tweet workingTweet = new Tweet(originalTweet);
+        Mockito.when(tweetRepository.findById(2L)).thenReturn(Optional.of(workingTweet));
+        Mockito.when(tweetRepository.save(workingTweet)).thenReturn(workingTweet);
+
+        Tweet updatedTweet = tweetServiceImp.updateContent(2L, "LOLLOLOL");
+
+        assertThat(updatedTweet.getContent()).isNotEqualTo(originalTweet.getContent());
     }
 
     @Test
-    public void deleteAllTweetsByUserId() {
+    public void deleteAllTweetsByUserId() throws ParseException {
+        Set<Tweet> tweets = new HashSet<>();
+        tweets.add(originalTweet);
+        tweets.add(new Tweet("INLINE BOIS", "2019-05-05").withUser(originalUser));
+
+        Mockito.when(tweetRepository.findAllByUserId(1L)).thenReturn(new HashSet<>(tweets));
+
+        Set<Tweet> deletedTweets = tweetServiceImp.deleteAllTweetsByUserId(1L);
+
+        assertThat(deletedTweets).isEqualTo(tweets);
     }
 }

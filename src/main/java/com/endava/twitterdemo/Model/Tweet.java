@@ -38,6 +38,13 @@ public class Tweet {
         this.dateOfCreation = formatter.parse(dateOfCreation);
     }
 
+    public Tweet(Tweet original){
+        this.id = original.id;
+        this.content = original.content;
+        this.dateOfCreation = original.dateOfCreation;
+        this.user = original.user;
+    }
+
 
 
 

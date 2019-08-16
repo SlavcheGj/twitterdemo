@@ -20,8 +20,8 @@ public interface TweetService {
 
     Set<User> getAllUserThatHaveTweetedLastMonth() throws ParseException;
 
-    void updateContent(Long id, String content);
+    Tweet updateContent(Long id, String content);
 
-    void deleteAllTweetsByUserId(Long id);
+    Set<Tweet> deleteAllTweetsByUserId(Long id);
 
 }

@@ -71,16 +71,18 @@ public class TweetServiceImp implements TweetService {
     }
 
     @Override
-    public void updateContent(Long id, String content) {
+    public Tweet updateContent(Long id, String content) {
         Optional<Tweet> tweet = tweetRepository.findById(id);
         tweet.get().setContent(content);
-        tweetRepository.save(tweet.get());
+        return tweetRepository.save(tweet.get());
 
     }
 
     @Override
-    public void deleteAllTweetsByUserId(Long id) {
+    public Set<Tweet> deleteAllTweetsByUserId(Long id) {
+        Set<Tweet> deletedTweets = tweetRepository.findAllByUserId(id);
         tweetRepository.deleteAllByUserId(id);
+        return deletedTweets;
     }
 
 
