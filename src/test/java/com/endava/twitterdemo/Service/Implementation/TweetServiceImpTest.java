@@ -6,16 +6,18 @@ import com.endava.twitterdemo.Repository.TweetRepository;
 import com.endava.twitterdemo.Repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.text.ParseException;
 
 import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.*;
 
-
+@RunWith(SpringRunner.class)
 public class TweetServiceImpTest {
 
     @InjectMocks
@@ -54,7 +56,8 @@ public class TweetServiceImpTest {
 
         Tweet createdTweet = tweetServiceImp.createTweet(tweet, 1L);
 
-        assertThat(createdTweet);
+        assertThat(createdTweet.getContent()).isEqualTo(tweet.getContent());
+        assertThat(createdTweet.getDateOfCreation()).isEqualTo(tweet.getDateOfCreation());
     }
 
     @Test
