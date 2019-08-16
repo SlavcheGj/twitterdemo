@@ -1,0 +1,27 @@
+#Spring DATASOURCE (DataSourceAutoConfiguration & DataSourceProperties)
+### Common profile
+spring:
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
+
+---
+### DEV profile
+spring:
+  profiles: dev
+
+  datasource:
+      url: jdbc:h2:mem:twitterDemoDev
+      username: dev_db
+      password:
+  user:
+      password: password
+
+---
+### IT profile
+spring:
+  profiles: it
+
+  datasource:
+    url: jdbc:h2:mem:twitterDemo
+    username: it_db
+    password:

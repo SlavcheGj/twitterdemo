@@ -53,7 +53,7 @@ public class TweetController {
 
     //Get Tweets from user by date od creation
     @GetMapping(value = "/tweets/{id}/{dateOfCreation}")
-    public ResponseEntity<?> getTweetsByUserId(@PathVariable(value = "id") Long id, @PathVariable(value = "dateOfCreation") String date) throws ParseException {
+    public ResponseEntity<?> getTweetsByUserIdOnAGivenDate(@PathVariable(value = "id") Long id, @PathVariable(value = "dateOfCreation") String date) throws ParseException {
         Set<Tweet> tweetsByUserIdAndDate = tweetService.getAllTweetsByUserIdOnGivenDay(id, date);
         return new ResponseEntity<>(tweetsByUserIdAndDate, HttpStatus.OK);
 

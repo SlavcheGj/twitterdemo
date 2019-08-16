@@ -57,6 +57,7 @@ public class TweetServiceImp implements TweetService {
     public Set<User> getAllUserThatHaveTweetedLastMonth() throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         LocalDate beforeDate = LocalDate.now();
+        beforeDate=beforeDate.withDayOfMonth(1);
         LocalDate date = LocalDate.now();
         LocalDate afterDate;
         afterDate=date.minusMonths(2);

@@ -14,7 +14,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Optional;
 
 import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
@@ -74,10 +73,4 @@ public class UserServiceImpTest {
 
     }
 
-   /* @Test
-    public void deleteUser() {
-            Mockito.when(userRepository.deleteById(1L));
-            userServiceImp.deleteUser(1L);
-            assertNull(userRepository.findById(1L));
-    }*/
 }
